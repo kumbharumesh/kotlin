@@ -170,6 +170,28 @@ class JvmBackendContext(
             multifileFacade.setValue(newPartClasses.toMutableList())
         }
 
+        for ((staticReplacement, original) in inlineClassReplacements.originalFunctionForStaticReplacement) {
+            val oldOriginal = functionSymbolMap[original.symbol]?.owner ?: continue
+            val oldStaticReplacement = inlineClassReplacements.getReplacementFunction(oldOriginal) ?: continue
+            staticReplacement as IrSimpleFunction
+            functionSymbolMap[staticReplacement.symbol] = oldStaticReplacement.symbol
+        }
+
+        for ((original, suspendView) in suspendFunctionOriginalToView) {
+            val oldOriginal = functionSymbolMap[original.symbol]?.owner ?: continue
+            val oldSuspendView = suspendFunctionOriginalToView[oldOriginal] ?: continue
+            suspendView as? IrSimpleFunction ?: continue
+            oldSuspendView as? IrSimpleFunction ?: continue
+            functionSymbolMap[suspendView.symbol] = oldSuspendView.symbol
+        }
+
+        for ((nonStaticDefaultSymbol, staticDefault) in staticDefaultStubs) {
+            val staticDefaultSymbol = staticDefault.symbol
+            val oldNonStaticDefaultSymbol = functionSymbolMap[nonStaticDefaultSymbol] ?: continue
+            val oldStaticDefaultSymbol = staticDefaultStubs[oldNonStaticDefaultSymbol]?.symbol ?: continue
+            functionSymbolMap[staticDefaultSymbol] = oldStaticDefaultSymbol
+        }
+
         super.handleDeepCopy(classSymbolMap, functionSymbolMap)
     }
 

@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.lower
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -201,8 +202,8 @@ private class PerformByIrFilePhase<Context : CommonBackendContext>(
         input.files.addAll(filesAndStates.map { (irFile, _) -> irFile }.toMutableList())
 
         adjustDefaultArgumentStubs(context, remappedFunctions)
-        input.transformChildrenVoid(CrossFileCallAdjuster(remappedFunctions))
         context.handleDeepCopy(remappedClasses, remappedFunctions)
+        input.transformChildrenVoid(CrossFileCallAdjuster(remappedFunctions))
 
         // TODO: no guarantee that module identity is preserved by `lower`
         return input
@@ -331,6 +332,12 @@ fun adjustDefaultArgumentStubs(
 private class CrossFileCallAdjuster(
     val remappedFunctions: Map<IrSimpleFunctionSymbol, IrSimpleFunctionSymbol>
 ) : IrElementTransformerVoid() {
+
+    override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
+        declaration.overriddenSymbols = declaration.overriddenSymbols.map { remappedFunctions[it] ?: it }
+        return super.visitSimpleFunction(declaration)
+    }
+
     override fun visitCall(expression: IrCall): IrExpression {
         expression.transformChildrenVoid(this)
         return remappedFunctions[expression.symbol]?.let { newSymbol ->
