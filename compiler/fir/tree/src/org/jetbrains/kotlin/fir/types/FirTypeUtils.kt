@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.fir.types
 
-import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
+import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.render
 import org.jetbrains.kotlin.fir.symbols.StandardClassIds
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitBuiltinTypeRef
@@ -102,6 +102,16 @@ fun List<FirAnnotationCall>.computeTypeAttributes(
             CompilerConeAttributes.NoInfer.ANNOTATION_CLASS_ID -> attributes += CompilerConeAttributes.NoInfer
             CompilerConeAttributes.ExtensionFunctionType.ANNOTATION_CLASS_ID -> attributes += CompilerConeAttributes.ExtensionFunctionType
             CompilerConeAttributes.UnsafeVariance.ANNOTATION_CLASS_ID -> attributes += CompilerConeAttributes.UnsafeVariance
+            CompilerConeAttributes.JvmWildcard.ANNOTATION_CLASS_ID -> attributes += CompilerConeAttributes.JvmWildcard.Apply
+            CompilerConeAttributes.JvmWildcard.SUPPRESS_CLASS_ID -> {
+                val firstArgument = annotation.arguments.firstOrNull()
+                val unwrapped = (firstArgument as? FirWrappedArgumentExpression)?.expression ?: firstArgument
+                attributes += if (unwrapped is FirConstExpression<*> && unwrapped.value == false) {
+                    CompilerConeAttributes.JvmWildcard.Suppress.False
+                } else {
+                    CompilerConeAttributes.JvmWildcard.Suppress.True
+                }
+            }
             else -> additionalProcessor.invoke(attributes, classId)
         }
     }

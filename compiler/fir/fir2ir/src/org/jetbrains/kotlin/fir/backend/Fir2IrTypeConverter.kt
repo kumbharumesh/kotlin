@@ -100,6 +100,18 @@ class Fir2IrTypeConverter(
                         typeAnnotations += it
                     }
                 }
+                when (val jvmWildcard = jvmWildcard) {
+                    CompilerConeAttributes.JvmWildcard.Apply -> {
+                        builtIns.jvmWildcardAnnotationConstructorCall()?.let {
+                            typeAnnotations += it
+                        }
+                    }
+                    is CompilerConeAttributes.JvmWildcard.Suppress -> {
+                        builtIns.jvmSuppressWildcardsAnnotationConstructorCall(jvmWildcard.suppressIt)?.let {
+                            typeAnnotations += it
+                        }
+                    }
+                }
                 IrSimpleTypeImpl(
                     irSymbol, !typeContext.definitelyNotNull && this.isMarkedNullable,
                     fullyExpandedType(session).typeArguments.map { it.toIrTypeArgument(typeContext) },

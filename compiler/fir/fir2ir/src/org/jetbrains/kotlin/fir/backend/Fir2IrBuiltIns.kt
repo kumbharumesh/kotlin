@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.fir.resolve.firSymbolProvider
 import org.jetbrains.kotlin.fir.types.CompilerConeAttributes
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.defaultType
@@ -36,6 +37,22 @@ class Fir2IrBuiltIns(
 
     internal fun flexibleNullabilityAnnotationConstructorCall(): IrConstructorCall? =
         flexibleNullabilityAnnotationSymbol?.toConstructorCall()
+
+    private val jvmWildcardAnnotationSymbol by lazy {
+        annotationSymbolById(CompilerConeAttributes.JvmWildcard.ANNOTATION_CLASS_ID)
+    }
+
+    internal fun jvmWildcardAnnotationConstructorCall(): IrConstructorCall? =
+        jvmWildcardAnnotationSymbol?.toConstructorCall()
+
+    private val jvmSuppressWildcardsAnnotationSymbol by lazy {
+        annotationSymbolById(CompilerConeAttributes.JvmWildcard.SUPPRESS_CLASS_ID)
+    }
+
+    internal fun jvmSuppressWildcardsAnnotationConstructorCall(suppressIt: Boolean): IrConstructorCall? =
+        jvmSuppressWildcardsAnnotationSymbol?.toConstructorCall()?.apply {
+            putValueArgument(0, IrConstImpl.boolean(startOffset, endOffset, irBuiltIns.booleanType, suppressIt))
+        }
 
     private fun annotationSymbolById(id: ClassId): IrClassSymbol? =
         provider?.getClassSymbolById(id) ?: session.firSymbolProvider.getClassLikeSymbolByFqName(id)?.toSymbol(

@@ -39,7 +39,7 @@ object CompilerConeAttributes {
         val ANNOTATION_CLASS_ID = ClassId(FqName("kotlin.jvm.internal"), Name.identifier("EnhancedNullability"))
 
         override fun union(other: EnhancedNullability?): EnhancedNullability? = other
-        override fun intersect(other: EnhancedNullability?): EnhancedNullability? = this
+        override fun intersect(other: EnhancedNullability?): EnhancedNullability = this
         override fun isSubtypeOf(other: EnhancedNullability?): Boolean = true
 
         override val key: KClass<out EnhancedNullability> = EnhancedNullability::class
@@ -51,7 +51,7 @@ object CompilerConeAttributes {
         val ANNOTATION_CLASS_ID = ClassId(FqName("kotlin"), Name.identifier("ExtensionFunctionType"))
 
         override fun union(other: ExtensionFunctionType?): ExtensionFunctionType? = other
-        override fun intersect(other: ExtensionFunctionType?): ExtensionFunctionType? = this
+        override fun intersect(other: ExtensionFunctionType?): ExtensionFunctionType = this
         override fun isSubtypeOf(other: ExtensionFunctionType?): Boolean = true
 
         override val key: KClass<out ExtensionFunctionType> = ExtensionFunctionType::class
@@ -63,7 +63,7 @@ object CompilerConeAttributes {
         val ANNOTATION_CLASS_ID = ClassId(FqName("kotlin.internal.ir"), Name.identifier("FlexibleNullability"))
 
         override fun union(other: FlexibleNullability?): FlexibleNullability? = other
-        override fun intersect(other: FlexibleNullability?): FlexibleNullability? = this
+        override fun intersect(other: FlexibleNullability?): FlexibleNullability = this
         override fun isSubtypeOf(other: FlexibleNullability?): Boolean = true
 
         override val key: KClass<out FlexibleNullability> = FlexibleNullability::class
@@ -82,6 +82,27 @@ object CompilerConeAttributes {
 
         override fun toString(): String = "@UnsafeVariance"
     }
+
+    sealed class JvmWildcard : ConeAttribute<JvmWildcard>() {
+        object Apply : JvmWildcard()
+        sealed class Suppress(val suppressIt: Boolean) : JvmWildcard() {
+            object True : Suppress(suppressIt = true)
+            object False : Suppress(suppressIt = false)
+        }
+
+        override fun union(other: JvmWildcard?): JvmWildcard? = other
+        override fun intersect(other: JvmWildcard?): JvmWildcard = this
+        override fun isSubtypeOf(other: JvmWildcard?): Boolean = true
+
+        override val key: KClass<out JvmWildcard> = JvmWildcard::class
+
+        override fun toString(): String = "@JvmWildcard"
+
+        companion object {
+            val ANNOTATION_CLASS_ID = ClassId(FqName("kotlin.jvm"), Name.identifier("JvmWildcard"))
+            val SUPPRESS_CLASS_ID = ClassId(FqName("kotlin.jvm"), Name.identifier("JvmSuppressWildcards"))
+        }
+    }
 }
 
 val ConeAttributes.exact: CompilerConeAttributes.Exact? by ConeAttributes.attributeAccessor<CompilerConeAttributes.Exact>()
@@ -90,6 +111,7 @@ val ConeAttributes.enhancedNullability: CompilerConeAttributes.EnhancedNullabili
 val ConeAttributes.extensionFunctionType: CompilerConeAttributes.ExtensionFunctionType? by ConeAttributes.attributeAccessor<CompilerConeAttributes.ExtensionFunctionType>()
 val ConeAttributes.flexibleNullability: CompilerConeAttributes.FlexibleNullability? by ConeAttributes.attributeAccessor<CompilerConeAttributes.FlexibleNullability>()
 val ConeAttributes.unsafeVarianceType: CompilerConeAttributes.UnsafeVariance? by ConeAttributes.attributeAccessor<CompilerConeAttributes.UnsafeVariance>()
+val ConeAttributes.jvmWildcard: CompilerConeAttributes.JvmWildcard? by ConeAttributes.attributeAccessor<CompilerConeAttributes.JvmWildcard>()
 
 val ConeKotlinType.hasEnhancedNullability: Boolean
     get() = attributes.enhancedNullability != null
@@ -99,3 +121,6 @@ val ConeKotlinType.isExtensionFunctionType: Boolean
 
 val ConeKotlinType.hasFlexibleNullability: Boolean
     get() = attributes.flexibleNullability != null
+
+val ConeKotlinType.jvmWildcard: CompilerConeAttributes.JvmWildcard?
+    get() = attributes.jvmWildcard
