@@ -14,11 +14,15 @@ import org.jetbrains.kotlin.jps.build.KotlinBuilder
 import org.jetbrains.kotlin.jps.build.KotlinChunk
 import org.jetbrains.kotlin.jps.build.KotlinCompileContext
 import org.jetbrains.kotlin.jps.build.ModuleBuildTarget
+import org.jetbrains.kotlin.jps.model.kotlinFacet
 import org.jetbrains.kotlin.jps.model.platform
 import org.jetbrains.kotlin.platform.DefaultIdeTargetPlatformKindProvider
 import org.jetbrains.kotlin.platform.IdePlatformKind
+import org.jetbrains.kotlin.platform.SimplePlatform
 import org.jetbrains.kotlin.platform.idePlatformKind
 import org.jetbrains.kotlin.platform.impl.*
+import org.jetbrains.kotlin.platform.js.JsPlatform
+import org.jetbrains.kotlin.platform.js.JsPlatforms
 import org.jetbrains.kotlin.utils.LibraryUtils
 import kotlin.system.measureTimeMillis
 
@@ -151,10 +155,14 @@ internal class KotlinTargetsIndexBuilder internal constructor(
      * todo: remove when all projects migrated to facets
      */
     private fun detectTargetPlatform(target: ModuleBuildTarget): IdePlatformKind<*> {
-        if (hasJsStdLib(target)) return JsIdePlatformKind
+        if (target.module.kotlinFacet?.settings?.targetPlatform?.componentPlatforms?.any { JsPlatforms.allJsPlatforms.contains(it) } == true)
+            return JsIdePlatformKind
+        
 
         return DefaultIdeTargetPlatformKindProvider.defaultPlatform.idePlatformKind
     }
+    //no f=> jvm
+    //f exist=> list of platform
 
     private fun hasJsStdLib(target: ModuleBuildTarget): Boolean {
         JpsJavaExtensionService.dependencies(target.module)
