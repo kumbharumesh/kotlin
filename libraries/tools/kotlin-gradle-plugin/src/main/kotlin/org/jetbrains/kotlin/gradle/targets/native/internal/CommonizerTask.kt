@@ -61,6 +61,9 @@ internal open class CommonizerTask : DefaultTask() {
     /*
     Ensures that only one CommonizerTask can run at a time.
     This is necessary because of the sucess-marker mechansim of this task.
+    This is a phantom file: No one has the intention to actually create this output file.
+    However, telling Gradle that all those tasks rely on the same output file will enforce
+    non-parallel execution.
      */
     @get:OutputFile
     @Suppress("unused")
