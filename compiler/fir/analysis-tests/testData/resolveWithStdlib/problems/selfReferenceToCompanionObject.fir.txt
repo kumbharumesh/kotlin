@@ -15,7 +15,7 @@ FILE: selfReferenceToCompanionObject.kt
 
         public final companion object Companion : R|Base| {
             private constructor(): R|Host.Companion| {
-                super<R|Base|>(this@R|/Host.Companion|.R|kotlin/run|<R|() -> kotlin/String|>(<L> = run@fun <anonymous>(): R|() -> kotlin/String| <kind=EXACTLY_ONCE>  {
+                super<R|Base|>(R|kotlin/run|<R|() -> kotlin/String|>(<L> = run@fun <anonymous>(): R|() -> kotlin/String| <kind=EXACTLY_ONCE>  {
                     ^ run@fun <anonymous>(): R|kotlin/String| {
                         ^ Q|Host|.R|/Host.Companion.ok|()
                     }
