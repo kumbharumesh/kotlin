@@ -30,8 +30,7 @@ internal const val COMMONIZER_TASK_NAME = "runCommonizer"
 
 internal typealias KonanTargetGroup = Set<KonanTarget>
 
-internal open class CommonizerTask @Inject constructor(
-) : DefaultTask() {
+internal open class CommonizerTask : DefaultTask() {
 
     private val konanHome = project.file(project.konanHome)
 
