@@ -84,7 +84,7 @@ internal open class CommonizerTask : DefaultTask() {
             callCommonizerCLI(project, executionEnvironment.commandLineArguments)
             executionEnvironment.stagedDirectories.forEach { stagedDirectory -> stagedDirectory.onSuccess() }
             executionEnvironment.successMarkers.forEach { successMarker -> successMarker.writeSuccess() }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             executionEnvironment.stagedDirectories.forEach { stagedDirectory -> stagedDirectory.onFailure() }
             executionEnvironment.successMarkers.forEach { successMarker -> successMarker.delete() }
             throw e
