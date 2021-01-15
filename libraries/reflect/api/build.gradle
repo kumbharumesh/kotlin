@@ -5,6 +5,7 @@ apply plugin: 'kotlin'
 configureJvm6Project(project)
 
 def includeJava9 = BuildPropertiesExtKt.getIncludeJava9(project.kotlinBuildProperties)
+def useFir = project.kotlinBuildProperties.getUseFir()
 
 sourceSets {
     main {
@@ -47,7 +48,7 @@ compileKotlin {
                             "-Xnormalize-constructor-calls=enable",
                             "-Xno-optimized-callable-references",
                             "-Xno-kotlin-nothing-value-exception",
-                            "-Xopt-in=kotlin.RequiresOptIn"]
+                            "-Xopt-in=kotlin.RequiresOptIn"] + (useFir ? ["-Xuse-fir"] : [])
         moduleName = "kotlin-reflection"
     }
 }
