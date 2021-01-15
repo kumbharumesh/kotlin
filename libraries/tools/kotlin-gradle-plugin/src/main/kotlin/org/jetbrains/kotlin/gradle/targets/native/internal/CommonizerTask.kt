@@ -59,6 +59,14 @@ internal open class CommonizerTask @Inject constructor(
     val successMarkers
         get() = targetGroups.map { targets -> project.getSuccessMarker(targets).file }
 
+    /*
+    Ensures that only one CommonizerTask can run at a time.
+    This is necessary because of the sucess-marker mechansim of this task.
+     */
+    @get:OutputFile
+    @Suppress("unused")
+    val taskMutex: File = project.rootProject.file(".commonizer-phantom-output")
+
     @TaskAction
     fun run() {
         // first of all remove directories with unused commonized libraries plus temporary directories with commonized libraries

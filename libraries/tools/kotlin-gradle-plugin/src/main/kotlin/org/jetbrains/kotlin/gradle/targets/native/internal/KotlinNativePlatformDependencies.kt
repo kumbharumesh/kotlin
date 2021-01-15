@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.gradle.targets.metadata.getMetadataCompilationForSou
 import org.jetbrains.kotlin.gradle.targets.metadata.isKotlinGranularMetadataEnabled
 import org.jetbrains.kotlin.gradle.targets.native.internal.NativePlatformDependency.*
 import org.jetbrains.kotlin.gradle.tasks.registerTask
+import org.jetbrains.kotlin.gradle.tasks.withType
 import org.jetbrains.kotlin.gradle.utils.SingleWarningPerBuild
 import org.jetbrains.kotlin.konan.library.*
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -112,6 +113,7 @@ private class NativePlatformDependencyResolver(val project: Project, val kotlinV
         ) { commonizerTask ->
             commonizerTask.targetGroups = targetGroups.map { it.targets }.toSet()
         }
+
 
         // then, resolve dependencies one by one
         dependencies.forEach { (dependency, actions) ->
