@@ -110,7 +110,7 @@ private class NativePlatformDependencyResolver(val project: Project, val kotlinV
             COMMONIZER_TASK_NAME,
             CommonizerTask::class.java
         ) { commonizerTask ->
-            commonizerTask.targetGroups = targetGroups.map { it.targets }
+            commonizerTask.targetGroups = targetGroups.map { it.targets }.toSet()
         }
 
         // then, resolve dependencies one by one
